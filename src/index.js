@@ -23,3 +23,33 @@ app.get('/health', async (req, res) => {
     if (client) client.release();
   }
 });
+
+// 📚 Obtener todos los libros (GET)
+app.get('/api/libros', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM public.libros ORDER BY id ASC');
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ➕ Agregar un nuevo libro (POST)
+app.post('/api/libros', async (req, res) => {
+  const { titulo, autor, precio } = req.body;
+
+  // Validación básica opcional
+  if (!titulo || !autor) {
+    return res.status(400).json({ error: 'El título y el autor son obligatorios' });
+  }
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO public.libros (titulo, autor, precio) VALUES ($1, $2, $3) RETURNING *',
+      [titulo, autor, precio || 0.00]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});

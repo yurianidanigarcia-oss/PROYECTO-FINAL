@@ -1,3 +1,7 @@
+// Ruta raíz de bienvenida
+app.get('/', (req, res) => {
+  res.json({ message: 'API REST de Libros activa y lista para recibir peticiones.' });
+});
 app.get('/health', async (req, res) => {
   let client;
   try {
